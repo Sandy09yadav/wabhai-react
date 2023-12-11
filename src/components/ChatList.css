@@ -1,0 +1,15 @@
+.chatlist {
+    display: flex;
+    flex-direction: column;
+    flex: 0.25;
+    background: #236ee7;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+}
+
+.icons {
+    display: flex;
+}
