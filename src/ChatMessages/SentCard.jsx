@@ -4,7 +4,7 @@ import KeyboardDoubleArrowRightRoundedIcon from '@mui/icons-material/KeyboardDou
 
 const StyledContainer = styled('div')({
     display: 'flex',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
     maxWidth: 'calc(100% - 45px)',
 });
 

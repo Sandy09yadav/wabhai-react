@@ -12,7 +12,7 @@ import InputBase from '@mui/material/InputBase';
 import SendIcon from '@mui/icons-material/Send';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AttachmentIcon from '@mui/icons-material/Attachment';
-import SentCard from '../ChatMessages/SentCard';
+import CardList from './CardList';
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: 'white',
@@ -103,7 +103,7 @@ const ChatScreen = ({ activeChat }) => {
 
       <ChatContent>
         {/* Your chat content goes here */}
-        <SentCard />
+        <CardList />
       </ChatContent>
 
       {/* Input Container */}
