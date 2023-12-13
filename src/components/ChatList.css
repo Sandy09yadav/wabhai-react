@@ -2,14 +2,32 @@
     display: flex;
     flex-direction: column;
     flex: 0.25;
-    background: #236ee7;
+    background: white;
+    padding: 0 8px 0 8px;
+    border: 1px rgb(232, 232, 232) solid;
+    border-radius: 15px 0 0 0;
+    
 }
 
 .head {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 0 5px 0 12px;
 }
 
 .icons {
     display: flex;
+    gap: 7px;
 }
+
+.input {
+    padding: 0 12px 0 12px;
+    margin-bottom: 15px;
+}
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }

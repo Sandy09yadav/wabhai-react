@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import SideBar from './components/SideBar';
 import ChatList from './components/ChatList';
@@ -13,11 +13,13 @@ const Container = ({ children }) => {
 };
 
 function App() {
+  const [activeChat, setActiveChat] = useState(null);
+
   return <Container className='container'>
     <SideBar />
     <div className='container2'>
-      <ChatList />
-      <ChatScreen />
+      <ChatList setActiveChat={setActiveChat} />
+      <ChatScreen activeChat={activeChat} />
     </div>
   </Container>
 }

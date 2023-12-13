@@ -1,3 +1,4 @@
 .chatcard {
     display: flex;
+    cursor: pointer;
 }

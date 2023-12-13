@@ -4,6 +4,8 @@
     height: 100%;
     flex: 0.004;
     justify-content: space-between;
-    background: #0f1216;
+    background: whitesmoke;
     color: #fff;
+    padding-left: 5px;
+    padding-right: 5px;
 }
