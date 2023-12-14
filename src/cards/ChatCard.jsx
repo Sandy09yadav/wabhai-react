@@ -3,6 +3,7 @@ import './ChatCard.css'
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
+import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 
 const StyledCard = styled('div')(({ isActive }) => ({
   display: 'flex',
@@ -45,7 +46,11 @@ const ChatCard = ({ imageSrc, phoneNumber, otherText, date, onClick, isActive })
             >
               {phoneNumber}
             </Typography>
-            <Typography sx={{ color: 'gray', fontSize: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Typography sx={{
+              color: 'grey', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex',
+              alignItems: 'center', gap: '5px',
+            }}>
+              <DoneAllOutlinedIcon style={{ fontSize: '16px' }} />
               {otherText}
             </Typography>
           </div>

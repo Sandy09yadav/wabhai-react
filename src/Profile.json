@@ -1,0 +1,44 @@
+[
+    {
+        "name": "Sourabh",
+        "profilePic": "./logo512.png",
+        "message": "First Seat",
+        "date": "12:23"
+    },
+    {
+        "name": "Prachi",
+        "profilePic": "./logo512.png",
+        "message": "Second Seat",
+        "date": "12:24"
+    },
+    {
+        "name": "Shivam",
+        "profilePic": "./logo512.png",
+        "message": "Third Seat",
+        "date": "12:25"
+    },
+    {
+        "name": "Narayan",
+        "profilePic": "./logo512.png",
+        "message": "Fourth Seat",
+        "date": "12:26"
+    },
+    {
+        "name": "Satvik",
+        "profilePic": "./logo512.png",
+        "message": "Fifth Seat",
+        "date": "12:27"
+    },
+    {
+        "name": "Varnika",
+        "profilePic": "./logo512.png",
+        "message": "Sixth Seat",
+        "date": "12:28"
+    },
+    {
+        "name": "Kajal",
+        "profilePic": "./logo512.png",
+        "message": "Seventh Seat",
+        "date": "12:29"
+    }
+]

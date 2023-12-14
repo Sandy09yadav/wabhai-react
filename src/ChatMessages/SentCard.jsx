@@ -1,42 +1,54 @@
 import React from 'react'
 import { styled } from '@mui/material/styles';
-import KeyboardDoubleArrowRightRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
+import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 
 const StyledContainer = styled('div')({
     display: 'flex',
     justifyContent: 'flex-end',
-    maxWidth: 'calc(100% - 45px)',
+    maxWidth: 'calc(100% - 15px)',
 });
 
-const SentCard = () => {
+const SentCardContainer = styled('div')({
+    // maxWidth: 'calc(75%)',
+    margin: '15px 15px 5px 15px',
+    borderRadius: '8px',
+    backgroundColor: '#D9FDD3',
+    padding: '5px 10px 20px 10px',
+    position: 'relative',
+});
+
+const CardContent = styled('div')({
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
+});
+
+const SentCard = ({ message, date, image, video }) => {
+    const containerMaxWidth = image || video ? 'calc(25vw)' : 'calc(50vw)';
+
     return (
-        <StyledContainer >
-            <div
-                style={{
-                    maxWidth: 'calc(100% - 45px)',
-                    margin: '0 15px 5px 15px',
-                    borderRadius: '8px',
-                    backgroundColor: 'lightgreen',
-                    padding: '5px 10px 20px 10px',
-                    position: 'relative',
-                }}
-            >
-                <div style={{ fontSize: '16px' }}>asdhghgsd</div>
+        <StyledContainer>
+            <SentCardContainer style={{ maxWidth: containerMaxWidth }} >
+                {image && <img src={image} alt="yoursentimage" style={{ maxWidth: '100%', height: 'auto', borderRadius: '5px' }} />}
+                {video && (
+                    <video width="100%" controls style={{ maxWidth: '100%', borderRadius: '5px' }}>
+                        <source src={video} type="video/mp4" />
+                    </video>
+                )}
+                <CardContent style={{ fontSize: '15px' }}>{message}</CardContent>
                 <div
                     style={{
                         position: 'absolute',
-                        bottom: '2px',
+                        // bottom: '2px',
                         right: '10px',
                         display: 'flex',
-                        alignItems: 'center',
                     }}
                 >
-                    <div style={{ fontSize: '13px', color: 'white' }}>12/12/12</div>
+                    <div style={{ fontSize: '13px', color: 'grey' }}>{date}</div>
                     <div style={{ marginLeft: '5px' }}>
-                        <KeyboardDoubleArrowRightRoundedIcon style={{ fontSize: '20px', color: 'black' }} />
+                        <DoneAllOutlinedIcon style={{ fontSize: '20px', color: 'grey' }} />
                     </div>
                 </div>
-            </div>
+            </SentCardContainer>
         </StyledContainer >
     )
 }

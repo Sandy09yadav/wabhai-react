@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-// import { useState } from 'react';
+import { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,6 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import CardList from './CardList';
+import Profile from '../Sections/Profile';
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: 'white',
@@ -26,7 +27,6 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   justifyContent: 'space-between',
   paddingTop: theme.spacing(0.5),
   paddingBottom: theme.spacing(0.5),
-  // Override media queries injected by theme.mixins.toolbar
   '@media all': {
     minHeight: 45,
   },
@@ -35,6 +35,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 const ProfileContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
+  cursor: 'pointer',
 });
 
 const ProfileImage = styled(Avatar)({
@@ -78,26 +79,37 @@ const SendButton = styled(IconButton)({
 });
 
 const ChatScreen = ({ activeChat }) => {
+  const [anchorEl, setAnchorEl] = useState(false);
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <StyledAppBar position="static">
         <StyledToolbar>
-          <ProfileContainer>
+          <ProfileContainer onClick={handleProfileClick}>
             <ProfileImage src={activeChat?.imageSrc} alt="Profile Image" />
             <Typography
               variant="h9"
               noWrap
               component="div"
-              sx={{ flexGrow: 1, alignSelf: 'flex-end', color: 'black' }}
+              sx={{ flexGrow: 1, alignSelf: 'auto', color: 'black' }}
             >
               {activeChat?.phoneNumber}
             </Typography>
           </ProfileContainer>
           <IconButton size="large" aria-label="search" color="inherit">
-            <SearchIcon style={{ color: 'black', padding: '5px 5px 5px 5px' }} />
+            <SearchIcon style={{ color: '#636363', padding: '5px 5px 5px 5px' }} />
           </IconButton>
         </StyledToolbar>
+
+        {anchorEl && <Profile activeChat={activeChat} anchorEl={anchorEl} onClose={handleProfileClose} />}
       </StyledAppBar>
       {/* Chats */}
 

@@ -6,14 +6,14 @@ import RecievedCard from '../ChatMessages/RecievedCard';
 const CardList = () => {
     return (
         <div>
-            {messages.map((message, index) => {
-                const { isMe, text, time } = message;
+            {messages.map((data, index) => {
+                const { isMe } = data;
                 return (
                     <React.Fragment key={index}>
                         {isMe ? (
-                            <SentCard message={text} date={time} />
+                            <SentCard message={data.text} date={data.time} image={data.image} video={data.video} />
                         ) : (
-                            <RecievedCard message={text} date={time} />
+                            <RecievedCard message={data.text} date={data.time} image={data.image} video={data.video} />
                         )}
                     </React.Fragment>
                 );

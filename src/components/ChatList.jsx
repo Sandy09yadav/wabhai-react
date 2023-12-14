@@ -8,6 +8,7 @@ import BorderColorTwoToneIcon from '@mui/icons-material/BorderColorTwoTone';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import ChatCard from '../cards/ChatCard';
 import IconButton from '@mui/material/IconButton';
+import profile from '../Profile.json';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -18,7 +19,7 @@ const Search = styled('div')(({ theme }) => ({
   },
   marginLeft: 0,
   width: '100%',
-  border: `1px solid ${theme.palette.common.black}`,
+  border: `1px solid #cdcdcd`,
   [theme.breakpoints.up('sm')]: {
     width: 'auto',
   },
@@ -62,26 +63,12 @@ const ChatList = ({ setActiveChat }) => {
     });
   };
 
-  const chatData = [
-    {
-      imageSrc: "./logo192.png",
-      phoneNumber: "+91 9876543210",
-      otherText: "Other Text Here for 1",
-      date: "12/12/2023",
-    },
-    {
-      imageSrc: "./path/to/your/image2.jpg",
-      phoneNumber: "+91 9876543211",
-      otherText: "Other Text Here for 2",
-      date: "12/13/2023",
-    },
-    {
-      imageSrc: "./logo512.png",
-      phoneNumber: "+91 9876543212",
-      otherText: "Other Text Here for 3",
-      date: "12/14/2023",
-    },
-  ];
+  const chatData = profile.map((message, index) => ({
+    imageSrc: message.profilePic,
+    phoneNumber: message.name,
+    otherText: message.message,
+    date: message.date,
+  }));
 
   return (
     <div className='chatlist'>
@@ -99,7 +86,7 @@ const ChatList = ({ setActiveChat }) => {
       <div className='input'>
         <Search>
           <SearchIconWrapper>
-            <SearchIcon />
+            <SearchIcon style={{ color: '#cdcdcd', fontSize: '20px' }} />
           </SearchIconWrapper>
           <StyledInputBase
             placeholder="Search or start a new chat"
@@ -117,7 +104,6 @@ const ChatList = ({ setActiveChat }) => {
           />
         ))}
       </div>
-      {/* <ChatScreen activeChat={activeChat} /> */}
     </div>
   )
 }
