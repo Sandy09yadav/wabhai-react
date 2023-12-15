@@ -9,6 +9,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import ChatCard from '../cards/ChatCard';
 import IconButton from '@mui/material/IconButton';
 import profile from '../Profile.json';
+import AddContact from '../Sections/AddContact';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -54,6 +55,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const ChatList = ({ setActiveChat }) => {
   const [activeCard, setActiveCard] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
 
   const handleCardClick = (index) => {
     setActiveCard(index);
@@ -70,13 +73,21 @@ const ChatList = ({ setActiveChat }) => {
     date: message.date,
   }));
 
+  const handleSettingsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleSettingsClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <div className='chatlist'>
       <div className='head'>
         <h2 style={{ fontWeight: 'normal' }} >Chat</h2>
         <div className='icons'>
           <IconButton aria-label="attachment" style={{ padding: '5px 5px 5px 5px' }} >
-            <BorderColorTwoToneIcon style={{ fontSize: '20px' }} />
+            <BorderColorTwoToneIcon style={{ fontSize: '20px' }} onClick={handleSettingsClick} />
           </IconButton>
           <IconButton aria-label="attachment" style={{ padding: '5px 5px 5px 5px' }} >
             <MoreIcon style={{ fontSize: '20px' }} />
@@ -104,6 +115,8 @@ const ChatList = ({ setActiveChat }) => {
           />
         ))}
       </div>
+
+      <AddContact anchorEl={anchorEl} onClose={handleSettingsClose} />
     </div>
   )
 }

@@ -14,6 +14,8 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import CardList from './CardList';
 import Profile from '../Sections/Profile';
+import EmojiPicker from '../Buttons/EmojiPicker';
+import FileInput from '../Buttons/FileInput';
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: 'white',
@@ -79,7 +81,11 @@ const SendButton = styled(IconButton)({
 });
 
 const ChatScreen = ({ activeChat }) => {
-  const [anchorEl, setAnchorEl] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
 
   const handleProfileClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -87,6 +93,41 @@ const ChatScreen = ({ activeChat }) => {
 
   const handleProfileClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleEmojiClick = () => {
+    setIsEmojiPickerOpen(!isEmojiPickerOpen);
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji);
+  };
+
+  const handleFileChange = (file) => {
+    setSelectedFile(file);
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      console.log('Uploading file:', selectedFile);
+    }
+  };
+
+  const handleMessageUpload = () => {
+    if (message.trim() !== '') {
+      const currentTime = new Date();
+      const formattedTime = currentTime.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: message, isMe: true, time: formattedTime },
+      ]);
+
+      setMessage('');
+    }
   };
 
   return (
@@ -115,24 +156,38 @@ const ChatScreen = ({ activeChat }) => {
 
       <ChatContent>
         {/* Your chat content goes here */}
-        <CardList />
+        <CardList messages={messages} />
       </ChatContent>
 
+      {/* <FileInput onFileChange={handleFileChange} /> */}
+      <EmojiPicker
+        onSelectEmoji={handleEmojiSelect}
+        open={isEmojiPickerOpen}
+        onClose={() => setIsEmojiPickerOpen(false)}
+        pickerStyle={{ position: 'relative', bottom: '0', left: '0' }}
+      />
       {/* Input Container */}
       <InputContainer>
         <ActionButtons>
-          <IconButton aria-label="emoji" style={{ padding: '10px 10px 10px 10px' }} >
+          <IconButton aria-label="emoji" style={{ padding: '10px 10px 10px 10px' }} onClick={handleEmojiClick} >
             <InsertEmoticonIcon />
           </IconButton>
-          <IconButton aria-label="attachment" style={{ padding: '10px 10px 10px 10px' }} >
+          <IconButton aria-label="attachment" style={{ padding: '10px 10px 10px 10px' }} onClick={handleUpload} >
             <AttachmentIcon />
           </IconButton>
         </ActionButtons>
-        <InputField placeholder="Type a message" multiline />
-        <SendButton aria-label="send" style={{ padding: '10px 10px 10px 10px' }} >
+        <InputField
+          placeholder="Type a message"
+          multiline
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <SendButton aria-label="send" style={{ padding: '10px 10px 10px 10px' }} onClick={handleMessageUpload} >
           <SendIcon />
         </SendButton>
       </InputContainer>
+
+
     </Box>
   )
 }
