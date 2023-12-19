@@ -5,13 +5,14 @@ import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import IconButton from '@mui/material/IconButton';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import Settings from '../Sections/Settings';
+import AddAuthKey from '../Sections/AddAuthKey';
+// import AuthKey from '../AuthKey';
 
 const Container = styled.div`
     
 `
 
-const SideBar = () => {
+const SideBar = ({ handleAuthKeyChange }) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const handleSettingsClick = (event) => {
@@ -34,10 +35,11 @@ const SideBar = () => {
                 <IconButton aria-label="attachment" style={{ padding: '5px 5px 5px 5px' }} >
                     <AccountCircleRoundedIcon style={{ color: '#95959' }} />
                 </IconButton>
+                {/* <AuthKey></AuthKey> */}
             </div>
 
             {/* Settings Popover */}
-            <Settings anchorEl={anchorEl} onClose={handleSettingsClose} />
+            <AddAuthKey anchorEl={anchorEl} onClose={handleSettingsClose} handleAuthKeyChange={handleAuthKeyChange}  />
         </Container>
     )
 }

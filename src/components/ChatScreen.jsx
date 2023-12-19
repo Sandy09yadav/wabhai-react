@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,7 +15,8 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import CardList from './CardList';
 import Profile from '../Sections/Profile';
 import EmojiPicker from '../Buttons/EmojiPicker';
-import FileInput from '../Buttons/FileInput';
+import { useAuthKey } from './AuthKeyProvider';
+// import FileInput from '../Buttons/FileInput';
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: 'white',
@@ -80,12 +81,18 @@ const SendButton = styled(IconButton)({
   marginLeft: '8px',
 });
 
+
+
 const ChatScreen = ({ activeChat }) => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+
+  const { authKey, updateAuthKey } = useAuthKey();
+  const RECEIVER_MOBILE = '917073751663';
+  console.log(authKey, 'khasgdhs ')
 
   const handleProfileClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -103,23 +110,23 @@ const ChatScreen = ({ activeChat }) => {
     setMessage((prevMessage) => prevMessage + emoji);
   };
 
-  const handleFileChange = (file) => {
-    setSelectedFile(file);
-  };
+  // const handleFileChange = (file) => {
+  //   setSelectedFile(file);
+  // };
 
   const handleUpload = () => {
     if (selectedFile) {
       console.log('Uploading file:', selectedFile);
     }
   };
-
-  const handleMessageUpload = () => {
+  const handleMessageUpload = async () => {
     if (message.trim() !== '') {
       const currentTime = new Date();
       const formattedTime = currentTime.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
       });
+      console.log("yha s aja bhaiii", authKey);
 
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -127,8 +134,100 @@ const ChatScreen = ({ activeChat }) => {
       ]);
 
       setMessage('');
+
+      const newMessage = {
+        apiAuthkey: authKey,
+        receiverMobile: RECEIVER_MOBILE,
+        msg: message,
+        isMe: true,
+        time: formattedTime,
+      };
+
+      console.log('newMessage', newMessage);
+
+      var formdata = new FormData();
+      formdata.append("apiAuthkey", authKey);
+      formdata.append("receiverMobile", RECEIVER_MOBILE);
+      formdata.append("msg", message);
+      formdata.append("isMe", true);
+      formdata.append("time", formattedTime);
+
+      var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      try {
+        const response = await fetch("https://app.rapbooster.com/api/sendMsg", requestOptions);
+
+        if (response.ok) {
+          const result = await response.json();
+          const messageId = result.messageId;
+
+          console.log('API Response:', result);
+
+          // Call the function to check the message status
+          setTimeout(async () => {
+            await checkMessageStatus(messageId);
+          }, 5000);
+
+        } else {
+          // Handle non-OK response
+          console.log('API Error:', response.status, response.statusText);
+        }
+      } catch (error) {
+        // Handle fetch error
+        console.error('Fetch Error:', error);
+      }
+
     }
   };
+
+  const checkMessageStatus = async (messageId) => {
+    var formdata = new FormData();
+    formdata.append("apiAuthkey", authKey);
+    formdata.append("messageId", messageId);
+
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+
+    try {
+      const checkMsgStatusResponse = await fetch("https://app.rapbooster.com/api/checkMsgStatus", requestOptions);
+
+      if (checkMsgStatusResponse.ok) {
+        const result = await checkMsgStatusResponse.text();
+        console.log('Check Message Status Response:', result);
+      } else {
+        // Handle non-OK response
+        console.log('Check Message Status Error:', checkMsgStatusResponse.status, checkMsgStatusResponse.statusText);
+      }
+    } catch (error) {
+      // Handle fetch error
+      console.error('Check Message Status Fetch Error:', error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('Entering useEffect');
+    const handleKeyPress = (e) => {
+      console.log('Key pressed:', e.key);
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleMessageUpload();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      console.log('Cleaning up useEffect');
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [updateAuthKey]);
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -158,6 +257,7 @@ const ChatScreen = ({ activeChat }) => {
         {/* Your chat content goes here */}
         <CardList messages={messages} />
       </ChatContent>
+
 
       {/* <FileInput onFileChange={handleFileChange} /> */}
       <EmojiPicker
