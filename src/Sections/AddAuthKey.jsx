@@ -53,7 +53,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const AddAuthKey = ({ anchorEl, onClose, handleAuthKeyChange }) => {
+const AddAuthKey = ({ anchorEl, onClose, handleAuthKeyChange, isAuthKeyProvided, setAuthKeyProvided }) => {
     const { updateAuthKey } = useAuthKey();
     const [authKey, setauthKey] = useState('');
 
@@ -65,6 +65,10 @@ const AddAuthKey = ({ anchorEl, onClose, handleAuthKeyChange }) => {
         console.log('authKey after:', authKey);
         await handleAuthKeyChange(authKey);
         onClose();
+        if (authKey.length == 0) {
+
+            setAuthKeyProvided(false)
+        }
         console.log('handleAuthKeyChangeInternal finished');
     };
 

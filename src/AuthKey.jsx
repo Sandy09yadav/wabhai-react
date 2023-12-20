@@ -19,7 +19,7 @@ const AddAuthKeyContainer = styled('div')({
     gap: '15px',
 });
 
-const AuthKey = () => {
+const AuthKey = ({ isAuthKeyProvided, setAuthKeyProvided }) => {
     const [authKey, setAuthKey] = useState('');
     const { updateAuthKey } = useAuthKey();
 
@@ -32,6 +32,12 @@ const AuthKey = () => {
         await updateAuthKey(authKey);
         localStorage.setItem('authKey', authKey);
         handleAuthKeyChange(authKey);
+        if (authKey.length == 0) {
+
+            setAuthKeyProvided(false)
+        } else if (authKey.length > 0) {
+            setAuthKeyProvided(true)
+        }
         console.log(authKey, 'AuthKey ka console');
     };
 

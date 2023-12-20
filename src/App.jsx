@@ -43,17 +43,17 @@ function App() {
   };
 
   return (
-    <AuthKeyProvider value={authKey}>
+    <AuthKeyProvider value={{ authKey }}>
       {isAuthKeyProvided ? (
         <Container className='container'>
-          <SideBar handleAuthKeyChange={handleAuthKeyChange} />
+          <SideBar handleAuthKeyChange={handleAuthKeyChange} isAuthKeyProvided={isAuthKeyProvided} setAuthKeyProvided={setAuthKeyProvided} />
           <div className='container2'>
             <ChatList setActiveChat={setActiveChat} />
             <ChatScreen activeChat={activeChat} />
           </div>
         </Container>
       ) : (
-        <AuthKey />
+        <AuthKey isAuthKeyProvided={isAuthKeyProvided} setAuthKeyProvided={setAuthKeyProvided} />
       )}
     </AuthKeyProvider>
   );

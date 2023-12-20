@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import './SideBar.css';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -6,13 +6,14 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import IconButton from '@mui/material/IconButton';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import AddAuthKey from '../Sections/AddAuthKey';
+import AuthKeyProvider from './AuthKeyProvider';
 // import AuthKey from '../AuthKey';
 
 const Container = styled.div`
     
 `
 
-const SideBar = ({ handleAuthKeyChange }) => {
+const SideBar = ({ handleAuthKeyChange,isAuthKeyProvided, setAuthKeyProvided }) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const handleSettingsClick = (event) => {
@@ -22,7 +23,6 @@ const SideBar = ({ handleAuthKeyChange }) => {
     const handleSettingsClose = () => {
         setAnchorEl(null);
     };
-
     return (
         <Container className='sidebar'>
             <IconButton aria-label="attachment" style={{ padding: '5px 5px 5px 5px' }} >
@@ -39,7 +39,7 @@ const SideBar = ({ handleAuthKeyChange }) => {
             </div>
 
             {/* Settings Popover */}
-            <AddAuthKey anchorEl={anchorEl} onClose={handleSettingsClose} handleAuthKeyChange={handleAuthKeyChange}  />
+            <AddAuthKey anchorEl={anchorEl} onClose={handleSettingsClose} handleAuthKeyChange={handleAuthKeyChange}  isAuthKeyProvided={isAuthKeyProvided} setAuthKeyProvided={setAuthKeyProvided} />
         </Container>
     )
 }

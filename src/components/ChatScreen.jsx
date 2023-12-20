@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import SearchIcon from '@mui/icons-material/Search';
 import Avatar from '@mui/material/Avatar';
 import InputBase from '@mui/material/InputBase';
 import SendIcon from '@mui/icons-material/Send';
@@ -16,7 +15,9 @@ import CardList from './CardList';
 import Profile from '../Sections/Profile';
 import EmojiPicker from '../Buttons/EmojiPicker';
 import { useAuthKey } from './AuthKeyProvider';
-// import FileInput from '../Buttons/FileInput';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import FilePreview from './FileChoose';
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: 'white',
@@ -85,15 +86,41 @@ const SendButton = styled(IconButton)({
 
 const ChatScreen = ({ activeChat }) => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [selectedFileType, setSelectedFileType] = useState('image');
+  const [displayedFileType, setDisplayedFileType] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [anchorElMenu, setAnchorElMenu] = useState(null);
+  const [fileChooseVisible, setFileChooseVisible] = useState(false);
+  const [filePreview, setFilePreview] = useState(null);
+  // const [caption, setCaption] = useState('');
 
   const { authKey, updateAuthKey } = useAuthKey();
   const RECEIVER_MOBILE = '917073751663';
   console.log(authKey, 'khasgdhs ')
 
+  const fileInputRef = React.useRef(null);
+  // const menuAnchorRef = useRef(null);
+  const filePreviewRef = React.useRef(null);
+  useEffect(() => {
+    const handleClick = (event) => {
+      // Check if the clicked element is inside the file preview box
+      if (filePreviewRef.current && !filePreviewRef.current.contains(event.target)) {
+        // If filePreview is true, set it to false when the user clicks outside the file preview box
+        setFilePreview(false);
+      }
+    };
+
+    // Add a click event listener to the entire document
+    document.addEventListener('click', handleClick);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  }, [filePreview]);
   const handleProfileClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -107,20 +134,45 @@ const ChatScreen = ({ activeChat }) => {
   };
 
   const handleEmojiSelect = (emoji) => {
+    console.log(filePreview,'file preview')
+    setFilePreview(false)
     setMessage((prevMessage) => prevMessage + emoji);
   };
 
-  // const handleFileChange = (file) => {
-  //   setSelectedFile(file);
-  // };
-
-  const handleUpload = () => {
-    if (selectedFile) {
-      console.log('Uploading file:', selectedFile);
-    }
+  const handleAttachmentClick = (event) => {
+    // fileInputRef.current.click();
+    setAnchorElMenu(event.currentTarget);
+    setDisplayedFileType(null);
   };
-  const handleMessageUpload = async () => {
-    if (message.trim() !== '') {
+
+  const handleMenuItemClick = (fileType) => {
+    // Handle the selected file type as needed (e.g., update state)
+    setSelectedFileType(fileType);
+    setDisplayedFileType(fileType);
+
+    // Trigger the file input directly
+    setAnchorElMenu(null);
+
+    setTimeout(() => {
+      fileInputRef.current.click();
+    }, 0);
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    setFileChooseVisible(true);
+    setFilePreview(file);
+  };
+
+  const acceptedFileTypes = {
+    image: 'image/*, video/*',
+    audio: 'audio/*',
+    document: '.pdf, .doc, .docx',
+  };
+
+  const handleMessageUpload = async (file) => {
+    if (message?.trim() !== '') {
       const currentTime = new Date();
       const formattedTime = currentTime.toLocaleTimeString([], {
         hour: '2-digit',
@@ -151,6 +203,13 @@ const ChatScreen = ({ activeChat }) => {
       formdata.append("msg", message);
       formdata.append("isMe", true);
       formdata.append("time", formattedTime);
+      formdata.append("fileType", "");
+      formdata.append("mimeType", "");
+      formdata.append("fileName", "");
+
+      if (selectedFile) {
+        formdata.append("file", selectedFile);
+      }
 
       var requestOptions = {
         method: 'POST',
@@ -230,10 +289,10 @@ const ChatScreen = ({ activeChat }) => {
   }, [updateAuthKey]);
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh',position:'relative' }}>
       <StyledAppBar position="static">
         <StyledToolbar>
-          <ProfileContainer onClick={handleProfileClick}>
+          <ProfileContainer onClick={handleProfileClick} style={{ padding: '10px' }}>
             <ProfileImage src={activeChat?.imageSrc} alt="Profile Image" />
             <Typography
               variant="h9"
@@ -244,37 +303,77 @@ const ChatScreen = ({ activeChat }) => {
               {activeChat?.phoneNumber}
             </Typography>
           </ProfileContainer>
-          <IconButton size="large" aria-label="search" color="inherit">
+          {/* <IconButton size="large" aria-label="search" color="inherit">
             <SearchIcon style={{ color: '#636363', padding: '5px 5px 5px 5px' }} />
-          </IconButton>
+          </IconButton> */}
         </StyledToolbar>
 
         {anchorEl && <Profile activeChat={activeChat} anchorEl={anchorEl} onClose={handleProfileClose} />}
       </StyledAppBar>
       {/* Chats */}
+      {/* <Box sx={{ flexGrow: 1, overflowY: 'auto' }}> */}
 
-      <ChatContent>
-        {/* Your chat content goes here */}
-        <CardList messages={messages} />
-      </ChatContent>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto',position:'relative' }}>
 
+        <ChatContent>
+          {/* Your chat content goes here */}
+          <CardList messages={messages} />
+        </ChatContent>
+      </Box>
+      <div style={{ position: 'absolute', left: '10px', bottom: '10%',maxWidth:"52%" }}>
+        {/* Display the file preview component */}
+        {filePreview && (
+          <FilePreview
+            file={filePreview}
+            onClose={() => setFilePreview(null)}
+            handleMessageUpload={handleMessageUpload}
+            message={message}setMessage={setMessage}
+            filePreviewRef={filePreviewRef}
+          // style={{ position: 'absolute' }}
+          />
+        )}
 
+    
       {/* <FileInput onFileChange={handleFileChange} /> */}
       <EmojiPicker
         onSelectEmoji={handleEmojiSelect}
         open={isEmojiPickerOpen}
-        onClose={() => setIsEmojiPickerOpen(false)}
+        onClose={() => setIsEmojiPickerOpen(false)} 
         pickerStyle={{ position: 'relative', bottom: '0', left: '0' }}
+        previewConfig={{
+          defaultEmoji: '1f60a', // defaults to: "1f60a"
+          defaultCaption: 'hi', // defaults to: "What's your mood?"
+          showPreview: false
+        }}
       />
+  </div>
+      {/* </Box> */}
       {/* Input Container */}
       <InputContainer>
         <ActionButtons>
           <IconButton aria-label="emoji" style={{ padding: '10px 10px 10px 10px' }} onClick={handleEmojiClick} >
             <InsertEmoticonIcon />
           </IconButton>
-          <IconButton aria-label="attachment" style={{ padding: '10px 10px 10px 10px' }} onClick={handleUpload} >
+          <IconButton aria-label="attachment" style={{ padding: '10px 10px 10px 10px' }} onClick={handleAttachmentClick} >
             <AttachmentIcon />
           </IconButton>
+          <Menu
+            anchorEl={anchorElMenu}
+            open={Boolean(anchorElMenu)}
+            onClose={() => setAnchorElMenu(null)}
+            style={{ width: '300px', height: 'auto', borderRadius: '5px' }}
+          >
+            <MenuItem onClick={() => handleMenuItemClick('image')}>Image & Video</MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick('audio')}>Audio</MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick('document')}>Document</MenuItem>
+          </Menu>
+          <input
+            type="file"
+            accept={acceptedFileTypes[selectedFileType]}
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileInputChange}
+          />
         </ActionButtons>
         <InputField
           placeholder="Type a message"
@@ -286,7 +385,6 @@ const ChatScreen = ({ activeChat }) => {
           <SendIcon />
         </SendButton>
       </InputContainer>
-
 
     </Box>
   )
