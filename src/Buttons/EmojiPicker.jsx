@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Picker from 'emoji-picker-react';
 
 
-const EmojiPicker = ({ onSelectEmoji, open, onClose }) => {
+const EmojiPicker = ({ onSelectEmoji, open, onClose, isEmojiPickerOpenRef }) => {
     const [chosenEmoji, setChosenEmoji] = useState(null);
 
     const onEmojiClick = (event, emojiObject) => {
@@ -14,7 +14,8 @@ const EmojiPicker = ({ onSelectEmoji, open, onClose }) => {
     return (
         <>
             {open && (
-                <Picker
+                < Picker
+                    ref={isEmojiPickerOpenRef}
                     onEmojiClick={onEmojiClick}
                     pickerStyle={{ position: 'absolute', bottom: '48px', left: '0', height: 'auto', }}
                 />

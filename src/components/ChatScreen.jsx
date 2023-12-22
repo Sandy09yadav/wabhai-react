@@ -82,6 +82,32 @@ const SendButton = styled(IconButton)({
   marginLeft: '8px',
 });
 
+const OverlayContainer = styled('div')({
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
+  background: 'rgba(0, 0, 0, 0.7)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: '1000',
+  pointerEvents: 'none',
+});
+
+const CenteredDiv = styled('div')({
+  position: 'relative',
+  // width: '52%',
+  background: '#fff',
+  padding: '20px',
+  zIndex: '1001',
+  pointerEvents: 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 
 
 const ChatScreen = ({ activeChat }) => {
@@ -91,6 +117,7 @@ const ChatScreen = ({ activeChat }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [message, setMessage] = useState('');
+  const [caption, setCaption] = useState('');
   const [messages, setMessages] = useState([]);
   const [anchorElMenu, setAnchorElMenu] = useState(null);
   const [fileChooseVisible, setFileChooseVisible] = useState(false);
@@ -103,13 +130,14 @@ const ChatScreen = ({ activeChat }) => {
 
   const fileInputRef = React.useRef(null);
   // const menuAnchorRef = useRef(null);
-  const filePreviewRef = React.useRef(null);
+
+  const isEmojiPickerOpenRef = React.useRef(null);
   useEffect(() => {
     const handleClick = (event) => {
       // Check if the clicked element is inside the file preview box
-      if (filePreviewRef.current && !filePreviewRef.current.contains(event.target)) {
-        // If filePreview is true, set it to false when the user clicks outside the file preview box
-        setFilePreview(false);
+      if (isEmojiPickerOpenRef.current && !isEmojiPickerOpenRef.current.contains(event.target)) {
+        // If isEmojiPickerOpen is true, set it to false when the user clicks outside the file preview box
+        setIsEmojiPickerOpen(false);
       }
     };
 
@@ -120,7 +148,8 @@ const ChatScreen = ({ activeChat }) => {
     return () => {
       document.removeEventListener('click', handleClick);
     };
-  }, [filePreview]);
+  }, [isEmojiPickerOpen]);
+
   const handleProfileClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -134,7 +163,7 @@ const ChatScreen = ({ activeChat }) => {
   };
 
   const handleEmojiSelect = (emoji) => {
-    console.log(filePreview,'file preview')
+    console.log(filePreview, 'file preview')
     setFilePreview(false)
     setMessage((prevMessage) => prevMessage + emoji);
   };
@@ -160,9 +189,20 @@ const ChatScreen = ({ activeChat }) => {
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
+    const mimetype = file.type;
+    const [fileType] = mimetype.split('/');
+
     setSelectedFile(file);
+    setSelectedFileType(fileType);
     setFileChooseVisible(true);
     setFilePreview(file);
+  };
+
+  const clearFilePreview = () => {
+    setSelectedFile(null);
+    setFileChooseVisible(false);
+    setFilePreview(null);
+    // Add any additional state updates related to file clearing
   };
 
   const acceptedFileTypes = {
@@ -172,43 +212,42 @@ const ChatScreen = ({ activeChat }) => {
   };
 
   const handleMessageUpload = async (file) => {
-    if (message?.trim() !== '') {
+    if ((message?.trim() !== '' || caption !== undefined) && (selectedFile || file)) {
       const currentTime = new Date();
       const formattedTime = currentTime.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
       });
       console.log("yha s aja bhaiii", authKey);
+      console.log("file ka nam aayega", file.name);
+
+      console.log(selectedFile, "selectedFile before name")
+      // const fileName = selectedFile.name || '';
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: message, isMe: true, time: formattedTime },
+        { text: selectedFile ? (caption !== undefined ? caption : '') : message, isMe: true, time: formattedTime, file: selectedFile },
       ]);
 
       setMessage('');
-
-      const newMessage = {
-        apiAuthkey: authKey,
-        receiverMobile: RECEIVER_MOBILE,
-        msg: message,
-        isMe: true,
-        time: formattedTime,
-      };
-
-      console.log('newMessage', newMessage);
+      setCaption('');
+      clearFilePreview();
 
       var formdata = new FormData();
       formdata.append("apiAuthkey", authKey);
       formdata.append("receiverMobile", RECEIVER_MOBILE);
-      formdata.append("msg", message);
+
+      formdata.append("msg", selectedFile ? caption : message);
       formdata.append("isMe", true);
       formdata.append("time", formattedTime);
-      formdata.append("fileType", "");
-      formdata.append("mimeType", "");
-      formdata.append("fileName", "");
+      formdata.append("fileType", selectedFileType);
+      console.log(selectedFile, "selectedFile after name")
 
       if (selectedFile) {
         formdata.append("file", selectedFile);
+        formdata.append("mimeType", selectedFile ? selectedFile.type : '');
+        formdata.append("fileName", file.Name);
+        console.log(selectedFile, "selectedFile inside name")
       }
 
       var requestOptions = {
@@ -289,7 +328,7 @@ const ChatScreen = ({ activeChat }) => {
   }, [updateAuthKey]);
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh',position:'relative' }}>
+    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh', position: 'relative' }}>
       <StyledAppBar position="static">
         <StyledToolbar>
           <ProfileContainer onClick={handleProfileClick} style={{ padding: '10px' }}>
@@ -311,43 +350,48 @@ const ChatScreen = ({ activeChat }) => {
         {anchorEl && <Profile activeChat={activeChat} anchorEl={anchorEl} onClose={handleProfileClose} />}
       </StyledAppBar>
       {/* Chats */}
-      {/* <Box sx={{ flexGrow: 1, overflowY: 'auto' }}> */}
 
-      <Box sx={{ flexGrow: 1, overflowY: 'auto',position:'relative' }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', position: 'relative' }}>
 
         <ChatContent>
           {/* Your chat content goes here */}
-          <CardList messages={messages} />
+          <CardList messages={messages} selectedFile={selectedFile} />
         </ChatContent>
       </Box>
-      <div style={{ position: 'absolute', left: '10px', bottom: '10%',maxWidth:"52%" }}>
-        {/* Display the file preview component */}
-        {filePreview && (
-          <FilePreview
-            file={filePreview}
-            onClose={() => setFilePreview(null)}
-            handleMessageUpload={handleMessageUpload}
-            message={message}setMessage={setMessage}
-            filePreviewRef={filePreviewRef}
-          // style={{ position: 'absolute' }}
-          />
-        )}
+      {/* <div style={{ position: 'absolute', left: '30%', bottom: '30%', maxWidth: "52%" }}> */}
+      {/* Display the file preview component */}
+      {filePreview && (
+        <OverlayContainer>
+          <CenteredDiv>
+            <FilePreview
+              file={filePreview}
+              onClose={() => setFilePreview(null)}
+              handleMessageUpload={handleMessageUpload}
+              clearFilePreview={clearFilePreview}
+              caption={caption} setCaption={setCaption}
+            // filePreviewRef={filePreviewRef}
+            // handleReturnToMedia={handleReturnToMedia}
+            // handleDiscard={handleDiscard} 
+            />
+          </CenteredDiv>
+        </OverlayContainer>
+      )}
+      {/* </div> */}
 
-    
-      {/* <FileInput onFileChange={handleFileChange} /> */}
-      <EmojiPicker
-        onSelectEmoji={handleEmojiSelect}
-        open={isEmojiPickerOpen}
-        onClose={() => setIsEmojiPickerOpen(false)} 
-        pickerStyle={{ position: 'relative', bottom: '0', left: '0' }}
-        previewConfig={{
-          defaultEmoji: '1f60a', // defaults to: "1f60a"
-          defaultCaption: 'hi', // defaults to: "What's your mood?"
-          showPreview: false
-        }}
-      />
-  </div>
-      {/* </Box> */}
+      <div style={{ position: 'absolute', left: '0%', bottom: '6.6%', maxWidth: "52%" }}>
+        {/* <OverlayContainer>
+        <CenteredDiv> */}
+        {/* <FileInput onFileChange={handleFileChange} /> */}
+        <EmojiPicker
+          onSelectEmoji={handleEmojiSelect}
+          open={isEmojiPickerOpen}
+          onClose={() => setIsEmojiPickerOpen(null)}
+          pickerStyle={{ position: 'relative', bottom: '0', left: '0' }}
+          isEmojiPickerOpenRef={isEmojiPickerOpenRef}
+        />
+      </div>
+      {/* </CenteredDiv>
+      </OverlayContainer> */}
       {/* Input Container */}
       <InputContainer>
         <ActionButtons>
@@ -376,7 +420,7 @@ const ChatScreen = ({ activeChat }) => {
           />
         </ActionButtons>
         <InputField
-          placeholder="Type a message"
+          placeholder={'Type a message'}
           multiline
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -386,7 +430,7 @@ const ChatScreen = ({ activeChat }) => {
         </SendButton>
       </InputContainer>
 
-    </Box>
+    </Box >
   )
 }
 
